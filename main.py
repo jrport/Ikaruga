@@ -1,11 +1,10 @@
 from tupy import *
-from menu import Menu
+from menu import *
 
 def main():
-    paused: bool = True
-    menu: Menu = Menu()
-
-    run(globals())
+    menu = Menu()
 
 if __name__ == "__main__":
     main()
+
+run(globals())
