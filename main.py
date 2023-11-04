@@ -1,9 +1,10 @@
 from tupy import run
-from menu import *
+from bg_animation import Background
+from spaceships import *
 
 def main():
-    backgroung = Image("./assets/backgroung_jpg",100,100)
-    menu = Menu()
+    bg = Background()
+    player = Player()
     
 if __name__ == "__main__":
     main()
