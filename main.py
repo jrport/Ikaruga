@@ -1,5 +1,6 @@
 from tupy import run
-from game import *
+from game import game
+
 
 def main():
     session = game()
