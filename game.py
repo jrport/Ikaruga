@@ -5,4 +5,5 @@ class game:
     def __init__(self) -> None:
         self._background = Background()
         self.player = Player()
+        self.wave = None
 
