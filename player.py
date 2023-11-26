@@ -1,4 +1,4 @@
-from laser import Laser
+from laser import player_Laser
 from tupy import Image, keyboard
 
 UPPER_BOUND = 50
@@ -14,11 +14,16 @@ PINK_SHIP = './assets/pink_ship.png'
 class Player(Image):
     def __init__(self) -> None:
         super().__init__(ORANGE_SHIP, 250, 400)
-        self.hp = 3
+        self.cur_wave = 1
+        self.max_hp = 5
+        self.cur_hp = self.max_hp
         self.speed = 7
-        self.bullets: list[Laser] = []
         self.max_laser_cooldown = 10
         self.cur_laser_cooldown = 0
+        self.score = 0
+        self.wave_kills = 0
+        self.wave = None
+        self.wave_size: int = 4 + (self.cur_wave * 2)
 
     def update(self) -> None:
         self.reload()
@@ -36,7 +41,7 @@ class Player(Image):
     def shoot(self) -> None:
         if self.cur_laser_cooldown == 0:
             self.cur_laser_cooldown = self.max_laser_cooldown
-            self.bullets.append(Laser("ally",self.x, self.y))
+            bullet = player_Laser(self.x, self.y, self.wave.npcs, self)
         return
 
     def move(self, direction: str):
@@ -65,4 +70,6 @@ class Player(Image):
         if self.cur_laser_cooldown > 0:
             self.cur_laser_cooldown -= 1
 
-
+    def take_damage(self) -> None: 
+        self.cur_hp -= 1
+        

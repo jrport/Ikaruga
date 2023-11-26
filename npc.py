@@ -1,6 +1,9 @@
 from tupy import Image
-from laser import Laser
+from laser import enemy_Laser
+from typing import Optional
+from player import Player
 
+BOTTOM_BOUND = 580
 UPPER_BOUND = 0
 LEFT_BOUND = 10
 RIGHT_BOUND = 700
@@ -13,7 +16,7 @@ SPRITES: list[str] = [PURPLE_SHIP, BLUE_SHIP, PINK_SHIP]
 
 
 class Npc(Image):
-    def __init__(self, sprite: str, speed:int, direction: str, cooldown: int, x: int, y: int):
+    def __init__(self, sprite: str, speed:int, direction: str, cooldown: int, x: int, y: int, player: Optional[Player]):
         super().__init__(sprite, x, y)
         self.file = sprite
         self.speed = speed
@@ -22,17 +25,18 @@ class Npc(Image):
         self.cur_cooldown = 0
         self.alive = True
         self.count = 0
+        self.permission = False
+        self.player = player
 
     def shoot(self):
         if self.cur_cooldown <= 0:
-            bullet: Laser = Laser("enemy", self.x, self.y)
+            bullet: enemy_Laser = enemy_Laser(self.x, self.y, self.player)
             self.cur_cooldown = self.max_cooldown
         return
 
     def update(self) -> None:
         self.reload()
         self.shoot()
-        self.count += 1
         if self.direction == "LEFT":
             self.x += self.speed
         if self.direction == "RIGHT":
@@ -41,19 +45,12 @@ class Npc(Image):
             self.y -= self.speed
         if self.direction == "DOWN":
             self.y += self.speed
+        self.count += 1
         self.check_out_of_bounds()
 
-    def wait(self) -> None:
-        if self.count >= 30:
-            return
-
-    def destroy(self) -> None:
-        self.alive = False
-        self.wait()
-        super().destroy()
-
     def check_out_of_bounds(self) -> None:
-        if (self.x <= LEFT_BOUND) or (self.x >= RIGHT_BOUND) or (self.y <= UPPER_BOUND):
+        if (self.x <= LEFT_BOUND) or (self.x >= RIGHT_BOUND) or (self.y >= BOTTOM_BOUND):
+            self.alive = False
             self.destroy()
 
     def reload(self) -> None:
@@ -62,3 +59,16 @@ class Npc(Image):
             return
         self.cur_cooldown = self.max_cooldown
         return
+
+    def wait(self) -> None:
+       # while self.permission is False:
+       #     self.count += 1
+        return super().destroy()
+
+    def displace(self) -> None:
+        self.x = 800
+        self.y = 800
+
+    def die(self) -> None:
+        self.alive = False
+        self.wait()

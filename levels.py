@@ -1,6 +1,9 @@
+from typing import Optional
 from npc import Npc
 from grid import *
 import random
+
+from player import Player
 
 PURPLE_SHIP = './assets/purple_ship.png'  
 BLUE_SHIP = './assets/blue_ship.png'
@@ -11,8 +14,8 @@ SPRITES: list[str] = [PURPLE_SHIP, BLUE_SHIP, PINK_SHIP]
 DIRECTIONS = ["DOWN","LEFT","RIGHT"]
 
 class wave:
-    def __init__(self) -> None:
-        self.cur_wave = 1
+    def __init__(self, cur_num: int) -> None:
+        self.cur_wave = cur_num
         self.wave_size: int = 4 + (self.cur_wave * 2)
         self.enemy_count: int = self.wave_size
         self.wave_speeds: list[int] = []
@@ -20,12 +23,10 @@ class wave:
         self.wave_skins: list[str] = []
         self.base_speed: int = 1
         self.base_cooldown: int = 20
-        self._npcs: list[Npc] = []
+        self.npcs: list[Npc] = []
         self.fast_shooter: bool = True
         self.fast_ship: bool = True
-
-    def update(self):
-        self.check_enemy_lives()
+        self.player: Optional[Player] = None
 
     @property
     def npc_speed(self) -> int:
@@ -101,11 +102,10 @@ class wave:
         indexes: list[int] = self.populate_random_indexes()
         wave_specs: list[list[int]] = self.generate_wave_specs()
         for npc in range(self.wave_size):
-            self._npcs.append(self.generate_npc \
-                              (wave_specs[0][random.randint(0,wave_size)], \
+            self.generate_npc(wave_specs[0][random.randint(0,wave_size)], \
                               wave_specs[1][random.randint(0,wave_size)], \
                               wave_specs[2][random.randint(0,wave_size)], \
-                              wave_specs[3][random.randint(0,wave_size)]))
+                              wave_specs[3][random.randint(0,wave_size)])
 
     def generate_coords(self) -> tuple[int, int]:
         coords = (POSITION_MATRIX[random.randint(0,2), random.randint(0,11), 0], \
@@ -114,12 +114,25 @@ class wave:
 
     def generate_npc(self, file: str, direction: str, speed: int, cooldown: int) -> Npc:
         coords: tuple[int, int] = self.generate_coords()
-        npc = Npc(file, speed, direction, cooldown, coords[0], coords[1])
-        self._npcs.append(npc)
+        npc = Npc(file, speed, direction, cooldown, coords[0], coords[1], self.player)
+        self.npcs.append(npc) 
         return npc
 
+    def check_enemy_count(self) -> None:
+        if self.enemy_count <= 0:
+            print("proxima onda")
+            self.next_wave()
+
+    def next_wave(self) -> None:
+        pass
+
     def check_enemy_lives(self) -> None:
-        for enemy in self._npcs:
+        for enemy in self.npcs:
             if enemy.alive == False:
-                self._npcs.remove(enemy)
-                self.enemy_count = len(self._npcs)
+                enemy.permission = True
+                self.npcs.remove(enemy)
+                self.enemy_count = len(self.npcs)
+                print(self.enemy_count)
+     # I decided to check for collision due to poor planning, since I'm compositing the player in the wave, I'm forced to go with this path.
+    # Still I recognize that it would be significantly more efficient to have each bullet check for It's own collision.
+    # I will, instead be forced to constant compare this way.

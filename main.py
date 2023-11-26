@@ -1,11 +1,6 @@
-from tupy import run
+from tupy import *
 from game import game
 
+session = game()
 
-def main():
-    session = game()
-
-if __name__ == "__main__":
-    main()
-    
 run(globals())
