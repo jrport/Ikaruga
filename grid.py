@@ -1,5 +1,11 @@
-import random
+from typing import Any
 import numpy
+from numpy import ndarray, zeros
+
+# Esse código gerará algumas matrizes úteis pra criação e geração randomizada e procedural dos 
+# inimigos.
+
+# Primeiro algumas constantes,
 
 SHIP_WIDTH: int = 48
 
@@ -9,23 +15,22 @@ RIGHT_BOUND = 630
 BOTTOM_BOUND = 540
 HORIZONTAL_RANGE: int = LEFT_BOUND - RIGHT_BOUND 
 
-PLACEMENT_MATRIX: list[list[int]] = numpy.zeros((3,12), dtype=int)
-POSITION_MATRIX: list[list[int]] = numpy.zeros((3,12,2), dtype=int)
+# Essa matriz tridimensional permitirá que discretizemos todas as 36 posições possíveis
+# para as naves inimigas spawnarem e assim facilmente as indexaremos.
 
-X_COORD: int = LEFT_BOUND
-Y_COORD: int = UPPER_BOUND
-for t in range(3):
-    X_COORD = UPPER_BOUND
-    for i in range(12):
-        POSITION_MATRIX[t, i, 0] = X_COORD
-        X_COORD += 48
+POSITION_MATRIX: numpy.ndarray[numpy.ndarray[Any, Any], numpy.int_] = numpy.zeros((3,12,2))
+
+x_coord: int = LEFT_BOUND
+y_coord: int = UPPER_BOUND
+
 
 for t in range(3):
+    x_coord = UPPER_BOUND
     for i in range(12):
-        POSITION_MATRIX[t, i, 1] = Y_COORD
-    Y_COORD += 50
+        POSITION_MATRIX[t, i, 0] = x_coord
+        x_coord += 48
 
-def generate_placement(Matrix: list[list[list[int]]], enemy_count) -> list[list[list[int]]]:
-    for enemy in range(enemy_count):
-        Matrix[random.randint(0,2), random.randint(0,11)] = 1
-
+for t in range(3):
+    for i in range(12):
+        POSITION_MATRIX[t, i, 1] = y_coord
+    y_coord += 50
