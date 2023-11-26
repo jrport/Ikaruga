@@ -1,3 +1,4 @@
+from random import randint
 from tupy import Image
 from laser import enemy_Laser
 from typing import Optional
@@ -14,6 +15,7 @@ PINK_SHIP = './assets/pink_ship.png'
 
 SPRITES: list[str] = [PURPLE_SHIP, BLUE_SHIP, PINK_SHIP] 
 
+DIRECTIONS = ["LEFT","RIGHT"]
 
 class Npc(Image):
     def __init__(self, sprite: str, speed:int, direction: str, cooldown: int, x: int, y: int, player: Optional[Player]):
@@ -24,9 +26,8 @@ class Npc(Image):
         self.max_cooldown = cooldown
         self.cur_cooldown = 0
         self.alive = True
-        self.count = 0
-        self.permission = False
         self.player = player
+        self.crashed = False
 
     def shoot(self):
         if self.cur_cooldown <= 0:
@@ -45,7 +46,6 @@ class Npc(Image):
             self.y -= self.speed
         if self.direction == "DOWN":
             self.y += self.speed
-        self.count += 1
         self.check_out_of_bounds()
 
     def check_out_of_bounds(self) -> None:
@@ -60,15 +60,21 @@ class Npc(Image):
         self.cur_cooldown = self.max_cooldown
         return
 
-    def wait(self) -> None:
-       # while self.permission is False:
-       #     self.count += 1
-        return super().destroy()
-
     def displace(self) -> None:
         self.x = 800
         self.y = 800
 
     def die(self) -> None:
         self.alive = False
-        self.wait()
+        return super().destroy()
+
+    def reverse_direction(self) -> None:
+        if self.crashed is False:
+            if self.direction == "LEFT":
+                self.direction = "RIGHT"
+                return
+            if self.direction == "RIGHT":
+                self.direction = "LEFT"
+                return 
+            if self.direction == "DOWN":
+                self.direction = DIRECTIONS[randint(0,1)]

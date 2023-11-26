@@ -54,4 +54,3 @@ class player_Laser(Laser):
                 enemy.displace()
                 enemy.die()
                 self.sender.score += 1
-                self.sender.wave_kills += 1

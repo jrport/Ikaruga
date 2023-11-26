@@ -2,8 +2,8 @@ from laser import player_Laser
 from tupy import Image, keyboard
 
 UPPER_BOUND = 50
-LEFT_BOUND = 45
-RIGHT_BOUND = 630
+LEFT_BOUND = 30
+RIGHT_BOUND = 650
 BOTTOM_BOUND = 455
 
 ORANGE_SHIP = './assets/orange_ship.png'
@@ -21,7 +21,7 @@ class Player(Image):
         self.max_laser_cooldown = 10
         self.cur_laser_cooldown = 0
         self.score = 0
-        self.wave_kills = 0
+        self.damaged = False
         self.wave = None
         self.wave_size: int = 4 + (self.cur_wave * 2)
 
@@ -71,5 +71,11 @@ class Player(Image):
             self.cur_laser_cooldown -= 1
 
     def take_damage(self) -> None: 
-        self.cur_hp -= 1
+        if self.cur_hp > 0:
+            self.cur_hp -= 1
+        self.damaged = True
         
+    def reset(self) -> None:
+        self.cur_hp = self.max_hp
+        self.score = 0
+        self.damaged = False

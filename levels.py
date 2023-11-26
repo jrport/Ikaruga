@@ -2,7 +2,6 @@ from typing import Optional
 from npc import Npc
 from grid import *
 import random
-
 from player import Player
 
 PURPLE_SHIP = './assets/purple_ship.png'  
@@ -16,7 +15,7 @@ DIRECTIONS = ["DOWN","LEFT","RIGHT"]
 class wave:
     def __init__(self, cur_num: int) -> None:
         self.cur_wave = cur_num
-        self.wave_size: int = 4 + (self.cur_wave * 2)
+        self.wave_size: int = 1 + (self.cur_wave * 2)
         self.enemy_count: int = self.wave_size
         self.wave_speeds: list[int] = []
         self.wave_cd: list[int] = []
@@ -118,21 +117,25 @@ class wave:
         self.npcs.append(npc) 
         return npc
 
-    def check_enemy_count(self) -> None:
-        if self.enemy_count <= 0:
-            print("proxima onda")
-            self.next_wave()
-
-    def next_wave(self) -> None:
-        pass
-
-    def check_enemy_lives(self) -> None:
+    def check_enemy_lives(self) -> bool:
         for enemy in self.npcs:
             if enemy.alive == False:
                 enemy.permission = True
                 self.npcs.remove(enemy)
                 self.enemy_count = len(self.npcs)
-                print(self.enemy_count)
-     # I decided to check for collision due to poor planning, since I'm compositing the player in the wave, I'm forced to go with this path.
-    # Still I recognize that it would be significantly more efficient to have each bullet check for It's own collision.
-    # I will, instead be forced to constant compare this way.
+                return True
+        return False
+
+    def clear(self) -> None:
+        for enemy in self.npcs:
+            enemy.destroy()
+
+    def check_npc_collision(self) -> None:
+        self.other_npcs = self.npcs
+        for npc in self.npcs:
+            self.other_npcs.remove(npc)
+            for other_npc in self.other_npcs:
+                if npc._collides_with(other_npc):
+                    npc.reverse_direction()
+            self.other_npcs.append(npc)
+
