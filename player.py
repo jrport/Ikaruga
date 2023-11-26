@@ -1,4 +1,3 @@
-from typing import Optional
 from laser import Laser
 from tupy import Image, keyboard
 
@@ -17,10 +16,9 @@ class Player(Image):
         super().__init__(ORANGE_SHIP, 250, 400)
         self.hp = 3
         self.speed = 7
+        self.bullets: list[Laser] = []
         self.max_laser_cooldown = 10
         self.cur_laser_cooldown = 0
-        self.ammo = 1
-        self.type: Optional[str] = None
 
     def update(self) -> None:
         self.reload()
@@ -38,7 +36,7 @@ class Player(Image):
     def shoot(self) -> None:
         if self.cur_laser_cooldown == 0:
             self.cur_laser_cooldown = self.max_laser_cooldown
-            self.bullet:Laser = Laser("ally",self.x, self.y, None, None, None)
+            self.bullets.append(Laser("ally",self.x, self.y))
         return
 
     def move(self, direction: str):

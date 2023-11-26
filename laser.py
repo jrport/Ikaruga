@@ -1,30 +1,31 @@
-from tupy import Rectangle
+from tupy import BaseImage
 from typing import Optional
 
-class Laser(Rectangle):
-    def __init__(self, team: str, x: int, y: int, bonus: int, kind: str, wave: Optional[int]):
-        super().__init__(x, y, 5, 10, outline = 'orange', fill = 'orange')
-        self.damage_bonus = bonus
-        self.kind = kind 
+BULLET = "./assets/laser.png"
+
+UPPER_BOUND = -10
+LEFT_BOUND = 45
+RIGHT_BOUND = 630
+BOTTOM_BOUND = 540
+
+class Laser(BaseImage):
+    def __init__(self, team: str, x: int, y: int):
+        self._file = BULLET
+        self._x = x
+        self._y = y
         self.team = team
-        self.wave = wave
 
     def update(self) -> None:
-        if self.team == "ally":
-            self.move(self.kind)
-            return
-        if self.team == "enemy":
-            self.attack(self.wave)
+        self.move(self.team)
+        self.check_out_of_bounds()
 
-    def move(self, kind: Optional[str]) -> None:
-        if kind is None:
-            self.y -= 10
+    def move(self, kind: str) -> None:
+        if kind == "ally":
+            self._y -= 10
+        if kind == "enemy":
+            self._y += 10
 
-    def attack(self, wave: int) -> None:
-        try:
-            self.y += (5 + wave//2)
-        except TypeError:
-            print("Null wave")
-
-
-
+    def check_out_of_bounds(self) -> None:
+        if (self._y <= UPPER_BOUND) or (self._y >= BOTTOM_BOUND): 
+            self.destroy()
+        
